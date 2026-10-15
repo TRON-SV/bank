@@ -1,0 +1,33 @@
+﻿# Maven y Java
+**/target/
+*.class
+hs_err_pid*
+replay_pid*
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.project
+.classpath
+.settings/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Secretos y configuración local
+.env
+.env.*
+!.env.example
+application-local.properties
+application-secret.properties
+
+# Logs
+*.log
+logs/
+
+# Archivos temporales
+*.tmp
+*.swp
