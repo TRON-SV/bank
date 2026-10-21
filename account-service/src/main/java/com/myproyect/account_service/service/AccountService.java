@@ -40,7 +40,7 @@ public class AccountService {
 
         log.debug("Validating account number uniqueness");
         if (accountRepository.existsByAccountNumber(normalizedAccountNumber)) {
-            throw new DuplicateAccountNumberException(normalizedAccountNumber);
+            throw new DuplicateAccountNumberException();
         }
 
         Account account = new Account(customerId, normalizedAccountNumber, currency);

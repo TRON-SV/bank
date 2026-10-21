@@ -1,6 +1,7 @@
 package com.myproyect.account_service;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -20,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false) // ONLY for HTTP/business tests; NOT a Spring Security test.
+@ActiveProfiles("test")
 class AccountHttpIntegrationTests {
 
     @Container
