@@ -5,6 +5,11 @@ import com.myproyect.account_service.controller.AccountController;
 import com.myproyect.account_service.domain.Account;
 import com.myproyect.account_service.mapper.AccountMapper;
 import com.myproyect.account_service.service.AccountService;
+import com.myproyect.account_service.exception.ApiProblemFactory;
+import com.myproyect.account_service.exception.ApiProblemFactory;
+import com.myproyect.account_service.exception.ProblemAccessDeniedHandler;
+import com.myproyect.account_service.exception.ProblemAuthenticationEntryPoint;
+import com.myproyect.account_service.exception.SecurityProblemWriter;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +40,19 @@ import static org.mockito.Mockito.when;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-// Real Bearer filter, JWKS retrieval, RSA signature and claim validation.
+/**
+ * Verifica la autenticación y la autorización mediante la cadena real de filtros.
+ *
+ * <p>Utiliza JWT firmados, claves RSA efímeras y un servidor JWKS temporal.
+ * El servicio de negocio se simula para aislar las comprobaciones de seguridad.
+ */
 @WebMvcTest(AccountController.class)
-@Import({SecurityConfig.class, AccountMapper.class})
+@Import({SecurityConfig.class, AccountMapper.class, ApiProblemFactory.class,
+        SecurityProblemWriter.class, ProblemAuthenticationEntryPoint.class, ProblemAccessDeniedHandler.class})
 @ActiveProfiles("test")
 class AccountSecurityTests {
     private static final RSAKey KEY;
@@ -96,7 +110,13 @@ class AccountSecurityTests {
     @Test
     void anonymousCreationReturns401() throws Exception {
         mvc.perform(post("/api/v1/accounts").contentType(MediaType.APPLICATION_JSON).content(BODY))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("WWW-Authenticate", "Bearer"))
+                .andExpect(content().contentTypeCompatibleWith(
+                        MediaType.APPLICATION_PROBLEM_JSON
+                ))
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
         verifyNoInteractions(service);
     }
 
@@ -104,7 +124,12 @@ class AccountSecurityTests {
     void wrongScopeReturns403() throws Exception {
         mvc.perform(post("/api/v1/accounts").header("Authorization", bearer("accounts:read"))
                         .contentType(MediaType.APPLICATION_JSON).content(BODY))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentTypeCompatibleWith(
+                        MediaType.APPLICATION_PROBLEM_JSON
+                ))
+                .andExpect(jsonPath("$.status").value(403))
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
         verifyNoInteractions(service);
     }
 
@@ -136,7 +161,17 @@ class AccountSecurityTests {
         for (String jwt : invalid) {
             mvc.perform(post("/api/v1/accounts").header("Authorization", "Bearer " + jwt)
                     .contentType(MediaType.APPLICATION_JSON).content(BODY))
-                    .andExpect(status().isUnauthorized());
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(header().string(
+                            "WWW-Authenticate",
+                            "Bearer error=\"invalid_token\""
+                    ))
+                    .andExpect(content().contentTypeCompatibleWith(
+                            MediaType.APPLICATION_PROBLEM_JSON
+                    ))
+                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value("INVALID_TOKEN"));
         }
         verifyNoInteractions(service);
     }

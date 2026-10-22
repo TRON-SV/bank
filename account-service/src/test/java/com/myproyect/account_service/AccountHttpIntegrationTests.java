@@ -18,6 +18,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Verifica la creación de cuentas y las respuestas de error a través de HTTP.
+ *
+ * <p>Utiliza PostgreSQL efímero mediante Testcontainers. Los filtros de seguridad
+ * están desactivados para centrar estas pruebas en el flujo de negocio.
+ */
 @Testcontainers
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false) // ONLY for HTTP/business tests; NOT a Spring Security test.

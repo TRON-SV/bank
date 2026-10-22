@@ -20,6 +20,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Traduce excepciones de negocio, validación e infraestructura en respuestas HTTP.
+ *
+ * <p>Centraliza su registro y utiliza {@link ApiProblemFactory} para construir
+ * los cuerpos de error con un formato común.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler
         extends ResponseEntityExceptionHandler {

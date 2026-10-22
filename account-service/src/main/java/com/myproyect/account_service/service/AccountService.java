@@ -11,6 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+/**
+ * Gestiona la creación transaccional de cuentas.
+ *
+ * <p>Valida los datos de negocio, comprueba números duplicados y utiliza
+ * {@link AccountRepository} para persistir las cuentas.
+ */
 @Service
 public class AccountService {
 

@@ -15,6 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Recibe solicitudes HTTP de creación de cuentas y valida el DTO de entrada.
+ *
+ * <p>Delega las reglas de negocio en {@link AccountService} y utiliza un
+ * {@link EntityMapper} para construir la respuesta.
+ */
 @RestController
 @RequestMapping("/api/v1/accounts")
 public class AccountController {

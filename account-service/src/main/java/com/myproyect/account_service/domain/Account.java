@@ -5,6 +5,12 @@ import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Representa una cuenta persistida con su cliente, número, moneda y estado.
+ *
+ * <p>Una cuenta nueva inicia activa; los callbacks de persistencia mantienen
+ * sus fechas de creación y actualización.
+ */
 @Entity
 @Table(name = "accounts")
 public class Account {

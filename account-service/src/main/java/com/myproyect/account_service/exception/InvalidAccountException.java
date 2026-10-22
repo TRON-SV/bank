@@ -1,6 +1,8 @@
 package com.myproyect.account_service.exception;
 
-/** Invalid account creation request detected in the business layer. */
+/**
+ * Indica que los datos de creación de una cuenta incumplen una regla de negocio.
+ */
 public class InvalidAccountException extends IllegalArgumentException {
 
     public InvalidAccountException(String message) {

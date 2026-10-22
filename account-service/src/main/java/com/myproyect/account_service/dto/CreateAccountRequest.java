@@ -8,6 +8,13 @@ import jakarta.validation.constraints.Size;
 
 import java.util.UUID;
 
+/**
+ * Define los datos de entrada para crear una cuenta y sus restricciones de validación.
+ *
+ * @param customerId identificador obligatorio del cliente
+ * @param accountNumber número de cuenta no vacío, de hasta 20 caracteres
+ * @param currency código de moneda compuesto por tres letras mayúsculas
+ */
 public record CreateAccountRequest(
 
         @NotNull(message = "Customer ID is required")

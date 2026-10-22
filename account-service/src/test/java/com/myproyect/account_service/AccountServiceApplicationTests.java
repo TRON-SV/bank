@@ -20,6 +20,12 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+/**
+ * Verifica el contexto Spring, la persistencia y las reglas del servicio de cuentas.
+ *
+ * <p>Utiliza PostgreSQL efímero mediante Testcontainers para comprobar el
+ * almacenamiento, la recuperación, los duplicados y la validación de moneda.
+ */
 @Testcontainers
 @SpringBootTest
 @ActiveProfiles("test")

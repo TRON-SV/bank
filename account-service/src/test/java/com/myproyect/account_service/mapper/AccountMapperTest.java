@@ -9,6 +9,9 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Verifica la conversión de cuentas a DTO y el tratamiento de una entidad nula.
+ */
 class AccountMapperTest {
 
     private final AccountMapper mapper = new AccountMapper();
