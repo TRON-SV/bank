@@ -6,7 +6,6 @@ import com.myproyect.account_service.domain.Account;
 import com.myproyect.account_service.mapper.AccountMapper;
 import com.myproyect.account_service.service.AccountService;
 import com.myproyect.account_service.exception.ApiProblemFactory;
-import com.myproyect.account_service.exception.ApiProblemFactory;
 import com.myproyect.account_service.exception.ProblemAccessDeniedHandler;
 import com.myproyect.account_service.exception.ProblemAuthenticationEntryPoint;
 import com.myproyect.account_service.exception.SecurityProblemWriter;
@@ -44,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import java.util.UUID;
 /**
  * Verifica la autenticación y la autorización mediante la cadena real de filtros.
  *
@@ -132,7 +132,6 @@ class AccountSecurityTests {
                 .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
         verifyNoInteractions(service);
     }
-
     @Test
     void createScopeReturns201WithoutCsrfToken() throws Exception {
         when(service.createAccount(any(), anyString(), anyString()))
@@ -173,6 +172,51 @@ class AccountSecurityTests {
                     .andExpect(jsonPath("$.status").value(401))
                     .andExpect(jsonPath("$.code").value("INVALID_TOKEN"));
         }
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    void readScopeAllowsAccountLookup() throws Exception {
+        UUID accountId = UUID.randomUUID();
+
+        when(service.getAccountById(accountId))
+                .thenReturn(new Account(
+                        UUID.randomUUID(),
+                        "ACC-READ-001",
+                        "USD"
+                ));
+
+        mvc.perform(get("/api/v1/accounts/" + accountId)
+                        .header("Authorization", bearer("accounts:read")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accountNumber").value("ACC-READ-001"));
+    }
+
+    @Test
+    void createScopeCannotReadAccounts() throws Exception {
+        UUID accountId = UUID.randomUUID();
+
+        mvc.perform(get("/api/v1/accounts/" + accountId)
+                        .header("Authorization", bearer("accounts:create")))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    void anonymousReadReturns401WithoutCallingService() throws Exception {
+        UUID accountId = UUID.randomUUID();
+
+        mvc.perform(get("/api/v1/accounts/" + accountId))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("WWW-Authenticate", "Bearer"))
+                .andExpect(content().contentTypeCompatibleWith(
+                        MediaType.APPLICATION_PROBLEM_JSON
+                ))
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+
         verifyNoInteractions(service);
     }
 }

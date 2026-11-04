@@ -153,6 +153,20 @@ public class GlobalExceptionHandler
         );
     }
 
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handleAccountNotFound(
+            AccountNotFoundException ex) {
+
+        log.debug("Account lookup failed: account not found");
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(problemFactory.create(
+                        HttpStatus.NOT_FOUND,
+                        "ACCOUNT_NOT_FOUND",
+                        "The requested account was not found"
+                ));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleUnexpected(Exception ex) {
 
@@ -165,4 +179,6 @@ public class GlobalExceptionHandler
                         "An unexpected error occurred"
                 ));
     }
+
+
 }

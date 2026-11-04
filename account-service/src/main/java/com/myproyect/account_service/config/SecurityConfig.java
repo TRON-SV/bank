@@ -50,6 +50,11 @@ public class SecurityConfig {
                         ).permitAll()
 
                         .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/accounts/*"
+                        ).hasAuthority("SCOPE_accounts:read")
+
+                        .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/v1/accounts"
                         ).hasAuthority("SCOPE_accounts:create")

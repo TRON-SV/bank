@@ -4,6 +4,7 @@ import com.myproyect.account_service.domain.Account;
 import com.myproyect.account_service.exception.DuplicateAccountNumberException;
 import com.myproyect.account_service.exception.InvalidAccountException;
 import com.myproyect.account_service.repository.AccountRepository;
+import com.myproyect.account_service.exception.AccountNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -12,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 /**
- * Gestiona la creación transaccional de cuentas.
+ * Gestiona la creación transaccional y la búsqueda de cuentas por ID.
  *
  * <p>Valida los datos de negocio, comprueba números duplicados y utiliza
- * {@link AccountRepository} para persistir las cuentas.
+ * {@link AccountRepository} para persistir y recuperar las cuentas.
  */
 @Service
 public class AccountService {
@@ -53,5 +54,10 @@ public class AccountService {
         // Flush detects DB constraints before the transactional service returns.
         // The UNIQUE index remains the final safeguard for concurrent requests.
         return accountRepository.saveAndFlush(account);
+    }
+    @Transactional(readOnly = true)
+    public Account getAccountById(UUID accountId) {
+        return accountRepository.findById(accountId)
+                .orElseThrow(AccountNotFoundException::new);
     }
 }

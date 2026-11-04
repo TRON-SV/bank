@@ -14,12 +14,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.UUID;
 
 /**
- * Recibe solicitudes HTTP de creación de cuentas y valida el DTO de entrada.
+ * Atiende las solicitudes HTTP para crear cuentas y consultarlas por ID.
  *
- * <p>Delega las reglas de negocio en {@link AccountService} y utiliza un
- * {@link EntityMapper} para construir la respuesta.
+ * <p>Delega las reglas de negocio en {@link AccountService}, valida el DTO de
+ * creación y utiliza un {@link EntityMapper} para construir las respuestas.
  */
 @RestController
 @RequestMapping("/api/v1/accounts")
@@ -42,6 +46,12 @@ public class AccountController {
                 request.customerId(), request.accountNumber(), request.currency());
         // createAccount's transaction completed before this line.
         log.info("Account created successfully accountId={}", account.getId());
+        return accountMapper.toDto(account);
+    }
+
+    @GetMapping("/{id}")
+    public AccountResponse getAccountById(@PathVariable UUID id) {
+        Account account = accountService.getAccountById(id);
         return accountMapper.toDto(account);
     }
 }
